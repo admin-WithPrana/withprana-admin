@@ -7,6 +7,15 @@ export function middleware(req: NextRequest) {
   const authorized = Boolean(token);
   const { pathname } = req.nextUrl;
 
+   if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.includes('.') ||
+    pathname === '/favicon.ico'
+  ) {
+    return NextResponse.next();
+  }
+
 
   if (!authorized && pathname !== "/login") {
     return NextResponse.redirect(new URL("/login", req.nextUrl.origin));
@@ -21,6 +30,7 @@ export function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|logo.png|images/).*)",
+    "/((?!api|_next|favicon.ico).*)",
   ],
 };
+

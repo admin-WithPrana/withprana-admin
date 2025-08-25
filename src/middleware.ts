@@ -7,23 +7,23 @@ export function middleware(req: NextRequest) {
   const authorized = Boolean(token);
   const { pathname } = req.nextUrl;
 
-  //  if (
-  //   pathname.startsWith('/_next') ||
-  //   pathname.startsWith('/api') ||
-  //   pathname.includes('.') ||
-  //   pathname === '/favicon.ico'
-  // ) {
-  //   return NextResponse.next();
-  // }
+   if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.includes('.') ||
+    pathname === '/favicon.ico'
+  ) {
+    return NextResponse.next();
+  }
 
 
-  // if (!authorized && pathname !== "/login") {
-  //   return NextResponse.redirect(new URL("/login", req.nextUrl.origin));
-  // }
+  if (!authorized && pathname !== "/login") {
+    return NextResponse.redirect(new URL("/login", req.nextUrl.origin));
+  }
 
-  // if (authorized && pathname === "/login") {
-  //   return NextResponse.redirect(new URL("/dashboard", req.nextUrl.origin));
-  // }
+  if (authorized && pathname === "/login") {
+    return NextResponse.redirect(new URL("/dashboard", req.nextUrl.origin));
+  }
 
   return NextResponse.next();
 }

@@ -19,9 +19,9 @@ import { apiUser, categoryApi, meditationApis } from '@/lib/api'
 import CreateCategory from './_components/create_category'
 import CreateSubCategory from './_components/create_subcategory'
 import CreateTags from './_components/create_tags'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 
-function AddMeditation() {
+function MediationDetails() {
     const router = useRouter()
     const [selectedType, setSelectedType] = useState("audio")
     const [tags, setTags] = useState<any>([])
@@ -32,8 +32,10 @@ function AddMeditation() {
     const [submitType, setSubmitType] = useState('')
     const [loading, setLoading] = useState(false)
     const [fileName, setFileName] = useState("")
+    const params = useParams()
+    const meditationId = params?.id as string
 
-    const { register, handleSubmit, setValue, formState: { errors } } = useForm()
+    const { register, handleSubmit, setValue, getValues, formState: { errors } } = useForm()
 
     const imageInputRef = useRef<HTMLInputElement | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -140,12 +142,12 @@ function AddMeditation() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [categoryRes, subCategoryRes, tagRes] = await Promise.allSettled([
+                const [categoryRes, subCategoryRes, tagRes, meditationRes] = await Promise.allSettled([
                     fetcher(categoryApi.getAll, { method: 'GET' }),
                     fetcher(categoryApi.getAllsubcategory, { method: 'GET' }),
-                    fetcher(categoryApi.createTag, { method: 'GET' })
+                    fetcher(categoryApi.createTag, { method: 'GET' }),
+                    fetcher(meditationApis.getMediation(meditationId), { method: 'GET' })
                 ])
-
                 if (categoryRes.status === 'fulfilled') {
                     setCategories(categoryRes.value)
                 } else {
@@ -164,6 +166,35 @@ function AddMeditation() {
                     console.error('Tag fetch failed:', tagRes.reason)
                 }
 
+                if (meditationRes.status === 'fulfilled') {
+                    const meditation = meditationRes.value as any;
+
+                    // Set form values
+                    setValue('title', meditation.title || '');
+                    setValue('description', meditation.description || '');
+                    setValue('duration', meditation.duration || '');
+                    setValue('category', meditation.category || null);
+                    setValue('subcategory', meditation.subcategory || null);
+
+                    // Set selected type (audio, video, etc.)
+                    setSelectedType(meditation.type || 'audio');
+
+                    // Set selected tags
+                    if (meditation.tags && Array.isArray(meditation.tags)) {
+                        setSelectedTags(meditation.tags);
+                    }
+
+                    // Set image preview (thumbnail URL)
+                    if (meditation.thumbnail) {
+                        setImagePreview(meditation.thumbnail);
+                    }
+
+                    // Set file name if possible (e.g. meditation.audioFileName)
+                    if (meditation.link) {
+                        setFileName(meditation.link);
+                    }
+                }
+
             } catch (error) {
                 console.error('Unexpected fetch error:', error)
             }
@@ -172,7 +203,7 @@ function AddMeditation() {
         fetchData()
     }, [])
 
-
+    console.log(getValues('category'))
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="flex-1 p-3 mx-2 my-4 bg-white rounded-[20px] font-rubik-400">
 
@@ -236,24 +267,52 @@ function AddMeditation() {
                             <Label className="text-base font-light text-[#000000] mb-1">
                                 <Paperclip className="w-4 h-4 text-[#777777]" /> Upload File
                             </Label>
-                            <Input
-                                type="text"
-                                value={fileName}
-                                placeholder="Select file"
-                                readOnly
-                                className='w-full cursor-pointer'
-                                onClick={triggerUpload}
-                            />
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                accept="audio/*"
-                                className="hidden"
-                                onChange={handleFileChange}
-                            />
-                            <input type="hidden" {...register("file", { required: "Audio file is required" })} />
-                            {errors.file ? < p className="text-red-500 text-sm mt-1">{errors.file.message as string}</p> : <p className='text-[#777777] text-[12px]'>Upload (MP3 or MP4)</p>
-                            }
+
+                            {fileName ? (
+                                // Show audio filename + audio player
+                                <div className="flex flex-col gap-2">
+                                    <audio controls className="w-full mt-1">
+                                        <source src={fileName} type="audio/mpeg" />
+                                        Your browser does not support the audio element.
+                                    </audio>
+                                    {/* Button to replace audio */}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setFileName(''); // reset filename to allow upload
+                                            if (fileInputRef.current) fileInputRef.current.value = '';
+                                        }}
+                                        className="text-sm text-blue-600 underline mt-1"
+                                    >
+                                        Replace Audio
+                                    </button>
+                                </div>
+                            ) : (
+                                // Show the input to select file
+                                <>
+                                    <Input
+                                        type="text"
+                                        value={fileName}
+                                        placeholder="Select file"
+                                        readOnly
+                                        className='w-full cursor-pointer'
+                                        onClick={triggerUpload}
+                                    />
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        accept="audio/*"
+                                        className="hidden"
+                                        onChange={handleFileChange}
+                                    />
+                                    <input type="hidden" {...register("file", { required: "Audio file is required" })} />
+                                    {errors.file ? (
+                                        <p className="text-red-500 text-sm mt-1">{errors.file.message as string}</p>
+                                    ) : (
+                                        <p className='text-[#777777] text-[12px]'>Upload (MP3 or MP4)</p>
+                                    )}
+                                </>
+                            )}
                         </div>
 
                         {/* Title */}
@@ -309,7 +368,8 @@ function AddMeditation() {
                 <div>
                     <label className="block text-base font-light text-[#000000] mb-2">Category</label>
                     <div className="lg:flex gap-2">
-                        <Select onValueChange={(val) => setValue("category", JSON.parse(val))} >
+                        <Select
+                            e onValueChange={(val) => setValue("category", JSON.parse(val))} >
                             <SelectTrigger className="bg-[#ffffff] border-[#d9d9d9] w-full capitalize">
                                 <SelectValue placeholder="Select category" />
                             </SelectTrigger>
@@ -423,4 +483,4 @@ function AddMeditation() {
     )
 }
 
-export default AddMeditation
+export default MediationDetails

@@ -15,8 +15,6 @@ import { signOut } from "next-auth/react"
 
 export function AppSidebar() {
     const pathname = usePathname()
-
-    console.log(pathname)
     return (
         <Sidebar className="rounded-[20px]">
             <SidebarHeader>

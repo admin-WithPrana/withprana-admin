@@ -29,95 +29,58 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
 import Link from "next/link"
+import { meditationApis } from "@/lib/api"
+import { fetcher } from "@/lib/fetcher"
+import { mediationColumns } from "@/lib/coulmns/meditation.columns"
 
-// Dummy meditation data
-const dummyMeditations = [
-    {
-        id: "1",
-        title: "Morning Calm",
-        category: "Focus",
-        subCategory: "Beginner",
-        audio: "morning-calm.mp3",
-        tags: ["Productivity", "Focus"],
-        addedDate: "2025-08-15",
-    },
-    {
-        id: "2",
-        title: "Sleep Deeply",
-        category: "Sleep",
-        subCategory: "Intermediate",
-        audio: "sleep-deeply.mp3",
-        tags: ["Sleep", "Relaxation"],
-        addedDate: "2025-08-10",
-    },
-    {
-        id: "3",
-        title: "Breathe & Let Go",
-        category: "Meditation",
-        subCategory: "Advanced",
-        audio: "breathe-let-go.mp3",
-        tags: ["Anxiety", "Overthinking"],
-        addedDate: "2025-08-12",
-    },
-]
-
-// Column definitions
-const columns: ColumnDef<any>[] = [
-    {
-        accessorKey: "title",
-        header: "Title",
-        cell: ({ row }) => <div className="font-medium">{row.original.title}</div>,
-    },
-    {
-        accessorKey: "category",
-        header: "Category",
-        cell: ({ row }) => row.original.category,
-    },
-    {
-        accessorKey: "subCategory",
-        header: "Sub Category",
-        cell: ({ row }) => row.original.subCategory,
-    },
-    {
-        accessorKey: "audio",
-        header: "Audio File",
-        cell: ({ row }) => (
-            <Button variant="link" className="text-[#2b7272] p-0 h-auto text-sm">
-                {row.original.audio}
-            </Button>
-        ),
-    },
-    {
-        accessorKey: "tags",
-        header: "Tags",
-        cell: ({ row }) => (
-            <div className="flex gap-1 flex-wrap">
-                {row.original.tags.map((tag: string, index: number) => (
-                    <Badge
-                        key={index}
-                        className="bg-[#eef5ff] text-[#2b7272] border border-[#c1ece8]"
-                    >
-                        {tag}
-                    </Badge>
-                ))}
-            </div>
-        ),
-    },
-    {
-        accessorKey: "addedDate",
-        header: "Added Date",
-        cell: ({ row }) => row.original.addedDate,
-    },
-]
 
 export default function MeditationTable() {
-    const [data, setData] = React.useState(dummyMeditations)
+    const [data, setData] = React.useState([])
+    const [loading, setLoading] = React.useState(true)
+    const extendedColumns = React.useMemo(() => [
+        ...mediationColumns,
+        {
+            accessorKey: "action",
+            header: ({ column }) => (
+                <div className="text-[#2B7272]">Action</div>
+            ),
+            cell: ({ row }) => <Link href={`/dashboard/meditation/${row.original.id}`} className="capitalize cursor-pointer " > < Badge variant={"outline"} className="text - rubik - 400 rounded- 2xl "> <span className="text-[14px] font-light">View</span></Badge ></ Link >,
+        },
+    ], [mediationColumns, data]);
 
     const table = useReactTable({
         data,
-        columns,
+        columns: extendedColumns,
         getCoreRowModel: getCoreRowModel(),
     })
+
+    React.useEffect(() => {
+        (async () => {
+            try {
+                setLoading(true)
+                const res: any = await fetcher(meditationApis.create, {
+                    method: 'GET',
+                    params: {
+                        order: 'desc'
+                        // order: sortValue.order,
+                        // sort: sortValue.field,
+                        // subscriptionType: subscriptionType,
+                        // signupMethod,
+                        // page,
+                    }
+                });
+
+                console.log(res)
+                if (res) {
+                    setData(res)
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+            } finally {
+                setLoading(false)
+            }
+        })();
+    }, [])
 
     return (
         <div className="rounded-[20px]  p-6">
@@ -190,7 +153,7 @@ export default function MeditationTable() {
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
-                <Link href={"/dashboard/meditation/add"}><Button className="font-rubik-40">Add Meditation</Button></Link>
+                <Link href={"/dashboard/meditation/add"}><Button className="font-rubik-400 py-3 bg-[#1F5D57]">Add Meditation</Button></Link>
             </div>
 
             <div className="rounded-md border">
@@ -225,8 +188,8 @@ export default function MeditationTable() {
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No data available
+                                <TableCell colSpan={mediationColumns.length} className="h-24 text-center">
+                                    {loading ? "Loading ..." : "No data available"}
                                 </TableCell>
                             </TableRow>
                         )}

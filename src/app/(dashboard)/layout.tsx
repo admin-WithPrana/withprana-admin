@@ -12,7 +12,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         <div className='bg-[#F5F5F5] min-h-screen flex-1'>
             <SidebarProvider>
                 <AppSidebar />
-                <main className='flex-1'>
+                <main className='flex-1 overflow-x-hidden'>
                     <div className='flex gap-2 pt-3 items-center'>
                         <SidebarTrigger />
                         <Navigator />

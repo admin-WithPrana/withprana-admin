@@ -49,7 +49,7 @@ function Login() {
     };
 
     return (
-        <div className="w-[480px] mx-auto mt-10 p-6 border rounded-lg shadow-sm bg-white font-rubik-400">
+        <div className="w-10/12 md:w-[480px] mx-auto mt-4 lg:mt-10 p-6 border rounded-lg shadow-sm bg-white font-rubik-400">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div>
                     <Label htmlFor="email" className='mb-1 text-[14px]'>Email address</Label>
@@ -57,6 +57,7 @@ function Login() {
                         id="email"
                         type="email"
                         placeholder="admin@gmail.com"
+                        className='w-full'
                         {...register('email', { required: 'Email is required' })}
                     />
                     {errors.email && (

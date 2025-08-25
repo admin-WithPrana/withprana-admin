@@ -38,6 +38,7 @@ import { apiUser } from "@/lib/api"
 import { columns, User } from "@/lib/coulmns/user.columns"
 import UserDetails from "./userDetails"
 import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 
 export function DataTableDemo() {
@@ -99,127 +100,137 @@ export function DataTableDemo() {
 
     return (
         <div className="w-full">
-            <div className="py-4 font-rubik-400">
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="ml-auto">
-                            Signup Method <ChevronDown />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuCheckboxItem
-                            className="capitalize"
+            <div className="py-4 font-rubik-400 flex gap-3">
+                <Select >
+                    <SelectTrigger className="w-44 bg-white">
+                        <SelectValue
+                            placeholder="Signup Method"
+                            className="data-[placeholder]:text-black"
+                        />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                        <SelectItem value="email" className="font-rubik-400">Email</SelectItem>
+                        <SelectItem value="google" className="font-rubik-400">Google</SelectItem>
+
+                        <div className="border-t my-1" />
+                        <div
+                            className="px-3 py-2 text-sm text-red-500 hover:bg-red-50 cursor-pointer rounded-md font-rubik-400"
                         >
-                            Email
-                        </DropdownMenuCheckboxItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild className="mx-5">
-                        <Button variant="outline" className=" mx-2">
-                            Subscription Plan <ChevronDown />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        {table
-                            .getAllColumns()
-                            .filter((column) => column.getCanHide())
-                            .map((column) => {
-                                return (
-                                    <DropdownMenuCheckboxItem
-                                        key={column.id}
-                                        className="capitalize"
-                                        checked={column.getIsVisible()}
-                                        onCheckedChange={(value) =>
-                                            column.toggleVisibility(!!value)
-                                        }
-                                    >
-                                        {column.id}
-                                    </DropdownMenuCheckboxItem>
-                                )
-                            })}
-                    </DropdownMenuContent>
-                </DropdownMenu>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="ml-auto">
-                            Sort By <ChevronDown />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        {table
-                            .getAllColumns()
-                            .filter((column) => column.getCanHide())
-                            .map((column) => {
-                                return (
-                                    <DropdownMenuCheckboxItem
-                                        key={column.id}
-                                        className="capitalize"
-                                        checked={column.getIsVisible()}
-                                        onCheckedChange={(value) =>
-                                            column.toggleVisibility(!!value)
-                                        }
-                                    >
-                                        {column.id}
-                                    </DropdownMenuCheckboxItem>
-                                )
-                            })}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                            Clear Selection
+                        </div>
+                    </SelectContent>
+                </Select>
+
+                <Select >
+                    <SelectTrigger className="w-44 bg-white">
+                        <SelectValue
+                            placeholder="Signup Method"
+                            className="data-[placeholder]:text-black"
+                        />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                        <SelectItem value="email" className="font-rubik-400">Email</SelectItem>
+                        <SelectItem value="google" className="font-rubik-400">Google</SelectItem>
+
+                        <div className="border-t my-1" />
+                        <div
+                            className="px-3 py-2 text-sm text-red-500 hover:bg-red-50 cursor-pointer rounded-md font-rubik-400"
+                        >
+                            Clear Selection
+                        </div>
+                    </SelectContent>
+                </Select>
+
+                <Select >
+                    <SelectTrigger className="w-44 bg-white">
+                        <SelectValue placeholder="Sort By" className="data-[placeholder]:text-black" />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                        <div className="px-2 py-1">
+                            <p className="text-sm text-gray-500 px-2 font-rubik-400">Created At</p>
+                            <SelectItem value="createdAt-asc" className="font-rubik-400 pl-6">
+                                Ascending
+                            </SelectItem>
+                            <SelectItem value="createdAt-desc" className="font-rubik-400 pl-6">
+                                Descending
+                            </SelectItem>
+                        </div>
+
+                        <div className="px-2 py-1">
+                            <p className="text-sm text-gray-500 px-2 font-rubik-400">Last Login</p>
+                            <SelectItem value="lastLogin-asc" className="font-rubik-400 pl-6">
+                                Ascending
+                            </SelectItem>
+                            <SelectItem value="lastLogin-desc" className="font-rubik-400 pl-6">
+                                Descending
+                            </SelectItem>
+                        </div>
+
+                        <div className="border-t border-gray-200 my-1" />
+
+                        <div
+                            className="cursor-pointer px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded font-rubik-400 select-none"
+                        >
+                            Clear Selection
+                        </div>
+                    </SelectContent>
+                </Select>
+
             </div>
-            <div className="rounded-md border overflow-x-auto w-full">
-                <div className="min-w-[800px]">
-                    <Table>
-                        <TableHeader className="bg-[#DDF3E5] font-rubik-600 text-[#2B7272]">
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                <TableRow key={headerGroup.id}>
-                                    {headerGroup.headers.map((header) => {
-                                        return (
-                                            <TableHead key={header.id}>
-                                                {header.isPlaceholder
-                                                    ? null
-                                                    : flexRender(
-                                                        header.column.columnDef.header,
-                                                        header.getContext()
-                                                    )}
-                                            </TableHead>
-                                        )
-                                    })}
-                                </TableRow>
-                            ))}
-                        </TableHeader>
-                        <TableBody>
-                            {table.getRowModel().rows?.length ? (
-                                table.getRowModel().rows.map((row) => (
-                                    <TableRow
-                                        key={row.id}
-                                        data-state={row.getIsSelected() && "selected"}
-                                    >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id} className="py-4 font-rubik-400 bg-white">
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
+            <div className="max-w-full overflow-x-auto rounded-md border scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
+                <Table>
+                    <TableHeader className="bg-[#DDF3E5] font-rubik-600 text-[#2B7272]">
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => {
+                                    return (
+                                        <TableHead key={header.id}>
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                    header.column.columnDef.header,
+                                                    header.getContext()
                                                 )}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={columns.length}
-                                        className="h-24 text-center font-rubik-400"
-                                    >
-                                        {
-                                            loading ? "Loading..." : "No result"
-                                        }
-                                    </TableCell>
+                                        </TableHead>
+                                    )
+                                })}
+                            </TableRow>
+                        ))}
+                    </TableHeader>
+                    <TableBody>
+                        {table.getRowModel().rows?.length ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow
+                                    key={row.id}
+                                    data-state={row.getIsSelected() && "selected"}
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id} className="py-4 font-rubik-400 bg-white">
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                            )}
+                                        </TableCell>
+                                    ))}
                                 </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell
+                                    colSpan={columns.length}
+                                    className="h-24 text-center font-rubik-400"
+                                >
+                                    {
+                                        loading ? "Loading..." : "No result"
+                                    }
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
             </div>
             {/* <div className="flex items-center justify-end space-x-2 py-4">
                 <div className="text-muted-foreground flex-1 text-sm">

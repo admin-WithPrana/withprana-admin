@@ -7,8 +7,8 @@ export type User = {
     name: string
     email: string
     signupMethod: "email" | "google" | "github"
-    subscription: "Free Plan" | "Premium Plan"
-    created_at: string
+    subscriptionType: "free" | "premium"
+    createdAt: string
     active: "active" | "inactive" | "banned",
     action: string
 }
@@ -34,22 +34,37 @@ export const columns: ColumnDef<User>[] = [
         header: ({ column }) => (
             <div className="text-[#2B7272]">Signup Method</div>
         ),
-        cell: ({ row }) => <div className="capitalize">Email</div>,
+        cell: ({ row }) => <div className="capitalize">{row.getValue("signupMethod")}</div>,
     },
     {
-        accessorKey: "subscription",
+        accessorKey: "subscriptionType",
         header: ({ column }) => (
             <div className="text-[#2B7272]">Subscription</div>
         ),
-        cell: ({ row }) => <div className="capitalize"><Badge variant={"outline"} className="border-[#2B7272] text-rubik-400 rounded-2xl"><span className="text-[#2B7272]">Free</span></Badge></div>,
+        cell: ({ row }) => {
+            const value = row.getValue("subscriptionType") as string;
+            const isFree = value?.toLowerCase() === "free";
+
+            return (
+                <div className="capitalize">
+                    <Badge
+                        variant="outline"
+                        className={`border ${isFree ? "border-[#2B7272] text-[#2B7272]" : "border-yellow-600 text-yellow-600"
+                            } font-rubik-400 rounded-2xl`}
+                    >
+                        {isFree ? "Free" : "Premium"}
+                    </Badge>
+                </div>
+            );
+        },
     },
     {
-        accessorKey: "created_at",
+        accessorKey: "createdAt",
         header: ({ column }) => (
-            <div className="text-[#2B7272]">Last Login</div>
+            <div className="text-[#2B7272]">Created At</div>
         ),
         cell: ({ row }) => {
-            const date = new Date(row.getValue("created_at"))
+            const date = new Date(row.getValue("createdAt"))
             return <div>{date.toLocaleDateString()} {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
         },
     },

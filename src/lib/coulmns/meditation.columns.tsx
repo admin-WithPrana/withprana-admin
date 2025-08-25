@@ -45,7 +45,7 @@ export const mediationColumns: ColumnDef<any>[] = [
     },
     {
         accessorKey: "link",
-        header: () => <div className="text-[#2B7272]">Type</div>,
+        header: () => <div className="text-[#2B7272]">Typ</div>,
         cell: ({ row }) => (
             <Badge
                 variant="outline"
@@ -55,6 +55,31 @@ export const mediationColumns: ColumnDef<any>[] = [
                 {row.original.type}
             </Badge>
         ),
+    },
+    {
+        accessorKey: "tags",
+        header: () => <div className="text-[#2B7272]">Tags</div>,
+        cell: ({ row }) => {
+            const tags = row.original.meditationTags;
+
+            return (
+                <div className="flex flex-wrap gap-2">
+                    {tags && tags.length > 0 ? (
+                        tags.map((tag: any) => (
+                            <Badge
+                                key={tag.tag.id}
+                                variant="outline"
+                                className="border font-rubik-400 rounded-2xl mt-1 capitalize"
+                            >
+                                {tag.tag.name}
+                            </Badge>
+                        ))
+                    ) : (
+                        <span className="text-gray-400 italic text-center">No tags</span>
+                    )}
+                </div>
+            );
+        },
     },
     {
         accessorKey: "createdAt",

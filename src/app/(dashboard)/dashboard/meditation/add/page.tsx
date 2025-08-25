@@ -110,10 +110,8 @@ function AddMeditation() {
             }
 
 
+            formData.append('tags', JSON.stringify({ tags: selectedTags.map((item: any) => item.id) }));
 
-            selectedTags.forEach((tag: any, index: number) => {
-                formData.append('tags[]', tag.id);
-            });
 
             // Submit formData using fetch or your fetcher util
             console.log("FormData Submitted:", Array.from(formData.entries()));

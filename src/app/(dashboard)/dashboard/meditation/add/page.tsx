@@ -112,7 +112,7 @@ function AddMeditation() {
 
 
             selectedTags.forEach((tag: any, index: number) => {
-                formData.append(`tags[${index}]`, tag.id);
+                formData.append('tags[]', tag.id);
             });
 
             // Submit formData using fetch or your fetcher util

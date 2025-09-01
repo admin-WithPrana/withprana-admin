@@ -140,7 +140,7 @@ export function DataTableDemo() {
 
     return (
         <div className="w-full">
-            <div className="py-4 font-rubik-400 flex gap-3">
+            <div className="py-4 font-rubik-400 flex md:flex-row flex-col gap-3">
                 <Select value={signupMethod} onValueChange={handleChange}>
                     <SelectTrigger className="w-44 bg-white">
                         <SelectValue

@@ -6,7 +6,7 @@ export const apiUser={
 
 export const categoryApi={
     getAll:'/category',
-    getAllsubcategory:"/subcategory",
+    getAllsubcategory:(id:string)=>"/subcategory"+`?categoryId=${id}`,
     createCategory:'/category',
     createSubCategory:"/subcategory",
     createTag:"/tags"

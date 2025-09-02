@@ -2,16 +2,12 @@
 
 import * as React from "react"
 import {
-    ColumnDef,
-    ColumnFiltersState,
     flexRender,
     getCoreRowModel,
     getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
-    SortingState,
     useReactTable,
-    VisibilityState,
 } from "@tanstack/react-table"
 import {
     Table,
@@ -267,7 +263,7 @@ export function DataTableDemo() {
                                     className="h-24 text-center font-rubik-400"
                                 >
                                     {
-                                        loading ? "Loading..." : "No result"
+                                        loading ? "Loading..." : "No data available"
                                     }
                                 </TableCell>
                             </TableRow>

@@ -32,11 +32,22 @@ function AddMeditation() {
     const [submitType, setSubmitType] = useState('')
     const [loading, setLoading] = useState(false)
     const [fileName, setFileName] = useState("")
+    const [showCategory, setShowCategory] = useState(false)
+    const [showedCategories, setShowCategories] = useState([])
+    const [selectedCategory, setSelectedCategory] = useState<any>('')
+    const [showSubCategory, setShowSubCategory] = useState(false)
+    const [showedSubCategories, setShowSubCategories] = useState<any[]>([])
+    const [selectedSubCategory, setSelectedSubCategory] = useState<any>('')
+    const [showTags, setShowTags] = useState(false)
+    const [showedTags, setShowedTags] = useState<any[]>([])
 
     const { register, handleSubmit, setValue, formState: { errors } } = useForm()
 
     const imageInputRef = useRef<HTMLInputElement | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    const subCategoryRef = useRef<HTMLDivElement>(null);
 
     const handleDivClick = () => {
         imageInputRef.current?.click();
@@ -101,20 +112,16 @@ function AddMeditation() {
                 formData.append("file", data.file);
             }
 
-            if (data.category?.id) {
-                formData.append("categoryId", data.category.id);
+            if (data.category) {
+                formData.append("categoryId", selectedCategory.id);
             }
 
-            if (data.subcategory?.id) {
-                formData.append("subcategoryId", data.subcategory.id);
+            if (data.subcategory) {
+                formData.append("subcategoryId", selectedSubCategory.id);
             }
 
 
             formData.append('tags', JSON.stringify({ tags: selectedTags.map((item: any) => item.id) }));
-
-
-            // Submit formData using fetch or your fetcher util
-            console.log("FormData Submitted:", Array.from(formData.entries()));
 
             const res = await fetcher(meditationApis.create, { method: 'POST', data: formData });
             if (res) {
@@ -127,6 +134,7 @@ function AddMeditation() {
         }
     };
 
+
     const addCategory = (item: any) => {
         setCategories((prev: any) => [item, ...prev])
     }
@@ -135,12 +143,60 @@ function AddMeditation() {
         setSubCategories((prev: any) => [item, ...prev])
     }
 
+    const categoryChange = (value: string) => {
+        setShowCategory(true);
+        setSelectedCategory(value)
+        setShowCategories(
+            categories.filter((item: any) =>
+                item.name.toLowerCase().includes(value.trim().toLowerCase())
+            )
+        )
+    }
+
+    const onSelectCategory = async (value: any) => {
+        setSelectedCategory(value)
+        setShowCategory(false)
+        setValue('category', value?.name, { shouldValidate: true })
+        const res = await fetcher(categoryApi.getAllsubcategory(value.id), { method: 'GET' })
+        setSubCategories(res)
+    }
+
+    const onSelectSubCategory = (value: any) => {
+        setSelectedSubCategory(value)
+        setShowSubCategory(false)
+        setValue('subcategory', value?.name, { shouldValidate: true })
+    }
+
+    const subategoryChange = (value: string) => {
+        setShowSubCategory(true);
+        setSelectedSubCategory(value)
+        setShowSubCategories(
+            subcategories.filter((item: any) =>
+                item.name.toLowerCase().includes(value.trim().toLowerCase())
+            )
+        )
+    }
+
+    const onSelectTags = (value: any) => {
+        setSelectedTags((prev: any) => [value, ...prev]);
+        setShowTags(false)
+    }
+
+    const tagsChange = (value: string) => {
+        setShowTags(true);
+        setShowedTags(
+            tags.filter((item: any) =>
+                item.name.toLowerCase().includes(value.trim().toLowerCase())
+            )
+        )
+    }
+
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [categoryRes, subCategoryRes, tagRes] = await Promise.allSettled([
+                const [categoryRes, tagRes] = await Promise.allSettled([
                     fetcher(categoryApi.getAll, { method: 'GET' }),
-                    fetcher(categoryApi.getAllsubcategory, { method: 'GET' }),
                     fetcher(categoryApi.createTag, { method: 'GET' })
                 ])
 
@@ -148,12 +204,6 @@ function AddMeditation() {
                     setCategories(categoryRes.value)
                 } else {
                     console.error('Category fetch failed:', categoryRes.reason)
-                }
-
-                if (subCategoryRes.status === 'fulfilled') {
-                    setSubCategories(subCategoryRes.value)
-                } else {
-                    console.error('Subcategory fetch failed:', subCategoryRes.reason)
                 }
 
                 if (tagRes.status === 'fulfilled') {
@@ -169,6 +219,50 @@ function AddMeditation() {
 
         fetchData()
     }, [])
+
+    // Close dropdown on outside click
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target as Node)
+            ) {
+                setShowTags(false);
+            }
+        }
+
+        if (showTags) {
+            document.addEventListener("mousedown", handleClickOutside);
+        } else {
+            document.removeEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [showTags, setShowTags]);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (
+                subCategoryRef.current &&
+                !subCategoryRef.current.contains(event.target as Node)
+            ) {
+                setShowSubCategory(false);
+            }
+        }
+
+        if (showSubCategory) {
+            document.addEventListener("mousedown", handleClickOutside);
+        } else {
+            document.removeEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [showSubCategory, setShowSubCategory]);
 
 
     return (
@@ -196,7 +290,7 @@ function AddMeditation() {
                                     <img
                                         src={imagePreview}
                                         alt="Thumbnail preview"
-                                        className="w-full h-full rounded-lg object-cover"
+                                        className="w-full h-full rounded-lg object-contain"
                                     />
                                     <button
                                         onClick={removeImage}
@@ -306,21 +400,40 @@ function AddMeditation() {
                 {/* Category */}
                 <div>
                     <label className="block text-base font-light text-[#000000] mb-2">Category</label>
-                    <div className="lg:flex gap-2">
-                        <Select onValueChange={(val) => setValue("category", JSON.parse(val))} >
-                            <SelectTrigger className="bg-[#ffffff] border-[#d9d9d9] w-full capitalize">
-                                <SelectValue placeholder="Select category" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {
-                                    categories.map((item: any) => {
-                                        return < SelectItem value={JSON.stringify(item)} className='capitalize font-rubik-400' >{item.name}</SelectItem>
-                                    })
-                                }
-                            </SelectContent>
-                        </Select>
-                        <CreateCategory addCategory={addCategory} />
+                    <div className="relative lg:flex gap-2 w-full">
+                        <div className="relative w-full">
+                            <Input
+                                placeholder="Select a category"
+                                className="w-full"
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => categoryChange(e.target.value)}
+                                value={selectedCategory?.name || selectedCategory}
+                            />
+
+                            {showCategory && < div className="absolute top-full mt-1 w-full bg-white border hide-scrollbar  border-[#d9d9d9] rounded-md shadow-md max-h-60 overflow-y-auto z-10">
+                                {showedCategories.slice(0, 3).length > 0 ? (
+                                    showedCategories.slice(0, 3).map((item: any) => (
+                                        <div
+                                            key={item.id}
+                                            className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded-md m-1 cursor-pointer capitalize font-rubik-400"
+                                            onClick={() => onSelectCategory(item)}
+                                        >
+                                            {item.name}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="px-2 py-2 text-sm text-gray-500 text-center font-rubik-400">
+                                        No categories found
+                                    </div>
+                                )}
+                            </div>}
+                        </div>
+
+                        <div className="mt-2 lg:mt-0">
+                            <CreateCategory addCategory={addCategory} />
+                        </div>
                     </div>
+
+
                     {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category.message as string}</p>}
                     <input type="hidden" {...register("category", { required: "Category is required" })} />
                 </div>
@@ -328,20 +441,43 @@ function AddMeditation() {
                 {/* Sub Category */}
                 <div>
                     <label className="block text-base font-light text-[#000000] mb-2">Sub Category</label>
-                    <div className="lg:flex gap-2">
-                        <Select onValueChange={(val) => setValue("subcategory", JSON.parse(val))}>
-                            <SelectTrigger className="bg-[#ffffff] border-[#d9d9d9] w-full capitalize">
-                                <SelectValue placeholder="Select sub category" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {
-                                    subcategories.map((item: any) => {
-                                        return < SelectItem value={JSON.stringify(item)} className='capitalize font-rubik-400' >{item.name}</SelectItem>
-                                    })
-                                }
-                            </SelectContent>
-                        </Select>
-                        <CreateSubCategory addCategory={addSubCategory} />
+                    <div className="relative lg:flex gap-2 w-full">
+                        <div className="relative w-full">
+                            <Input
+                                placeholder="Select a subcategory"
+                                className="w-full"
+                                onChange={(e) => subategoryChange(e.target.value)}
+                                value={selectedSubCategory?.name || selectedSubCategory}
+                            />
+
+                            {showSubCategory && (
+                                <div
+                                    ref={subCategoryRef}
+                                    className="absolute top-full mt-1 w-full bg-white border hide-scrollbar border-[#d9d9d9] rounded-md shadow-md max-h-60 overflow-y-auto z-10"
+                                >
+                                    {showedSubCategories.length === 0 ? (
+                                        <div className="px-2 py-1.5 text-sm text-gray-500 m-1">
+                                            No subcategory found
+                                        </div>
+                                    ) : (
+                                        showedSubCategories.slice(0, 3).map((item: any) => (
+                                            <div
+                                                key={item.id}
+                                                className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded-md m-1 cursor-pointer capitalize font-rubik-400"
+                                                onClick={() => onSelectSubCategory(item)}
+                                            >
+                                                {item.name}
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            )}
+
+                        </div>
+
+                        <div className="mt-2 lg:mt-0">
+                            <CreateSubCategory addCategory={addSubCategory} />
+                        </div>
                     </div>
                     {errors.subcategory && <p className="text-red-500 text-sm mt-1">{errors.subcategory.message as string}</p>}
                     <input type="hidden" {...register("subcategory", { required: "Subcategory is required" })} />
@@ -351,31 +487,45 @@ function AddMeditation() {
             {/* Tags */}
             <div className="mt-8">
                 <label className="block text-base font-light text-[#000000] mb-2">Tags</label>
-                <div className="lg:flex gap-2">
-                    <Select onValueChange={(val: any) => {
-                        const _item = JSON.parse(val)
-                        setSelectedTags((prev: any) => {
-                            if (!prev.find((item: any) => item.id == _item.id)) {
-                                return [_item, ...prev];
-                            }
-                            return prev
-                        });
-                    }}>
-                        <SelectTrigger className="bg-[#ffffff] border-[#d9d9d9] w-full capitalize">
-                            <SelectValue placeholder="Select tags" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {
-                                tags.map((item: any) => {
-                                    return < SelectItem value={JSON.stringify(item)} className='capitalize font-rubik-400' >{item.name}</SelectItem>
-                                })
-                            }
-                        </SelectContent>
-                    </Select>
-                    <CreateTags addCategory={(val: any) => {
-                        setSelectedTags((prev: any) => [val, ...prev]);
-                        setTags((prev: any) => [val, ...prev])
-                    }} />
+
+                <div className="relative lg:flex gap-2 w-full">
+
+                    <div className="relative w-full">
+                        <Input
+                            placeholder="Select a tag"
+                            className="w-full"
+                            onChange={(e) => tagsChange(e.target.value)}
+                        />
+                        {showTags && (
+                            <div
+                                ref={dropdownRef}
+                                className="absolute top-full mt-1 w-full bg-white border hide-scrollbar border-[#d9d9d9] rounded-md shadow-md max-h-60 overflow-y-auto z-10"
+                            >
+                                {showedTags.length === 0 ? (
+                                    <div className="px-2 py-1.5 text-sm text-gray-500 m-1">
+                                        No tags found
+                                    </div>
+                                ) : (
+                                    showedTags.slice(0, 3).map((item: any) => (
+                                        <div
+                                            key={item.id}
+                                            className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded-md m-1 cursor-pointer capitalize font-rubik-400"
+                                            onClick={() => onSelectTags(item)}
+                                        >
+                                            {item.name}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="mt-2 lg:mt-0">
+                        <CreateTags addCategory={(val: any) => {
+                            setSelectedTags((prev: any) => [val, ...prev]);
+                            setTags((prev: any) => [val, ...prev])
+                        }} />
+                    </div>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap my-2">
                     {

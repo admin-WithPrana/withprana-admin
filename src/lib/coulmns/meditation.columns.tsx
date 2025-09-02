@@ -6,8 +6,8 @@ export const mediationColumns: ColumnDef<any>[] = [
     {
         accessorKey: "title",
         header: () => < div className="text-[#2B7272]" >Title</div>,
-        cell: ({ row }) => <div className="font-medium">
-            <p className="capitalize">{row.original.title}</p>
+        cell: ({ row }) => <div className="font-medium w-[200px]">
+            <p className="capitalize truncate overflow-hidden whitespace-nowrap">{row.original.title}</p>
             <Badge
                 variant="outline"
                 className={`border ${!row.original.isPremium ? "border-[#2B7272] text-[#2B7272]" : "border-yellow-600 text-yellow-600"
@@ -19,12 +19,12 @@ export const mediationColumns: ColumnDef<any>[] = [
     },
     {
         accessorKey: "category",
-        header: () => < div className="text-[#2B7272]" >Category</div>,
+        header: () => < div className="text-[#2B7272] min-w-[220px]" >Category</div>,
         cell: ({ row }) => row.original.category?.name ?? "-",
     },
     {
         accessorKey: "subcategory",
-        header: () => <div className="text-[#2B7272]">Sub Category</div>,
+        header: () => <div className="text-[#2B7272] px-3">Sub Category</div>,
         cell: ({ row }) => (
             <Badge
                 variant="outline"
@@ -36,6 +36,7 @@ export const mediationColumns: ColumnDef<any>[] = [
     },
     {
         accessorKey: "Duration",
+        header: () => <div className="text-[#2B7272] px-3 text-center">Duration</div>,
         cell: ({ row }) => {
             const totalSeconds = Number(row.original.duration)
             const minutes = String(Math.floor(totalSeconds)).padStart(2, "0")
@@ -45,7 +46,7 @@ export const mediationColumns: ColumnDef<any>[] = [
     },
     {
         accessorKey: "link",
-        header: () => <div className="text-[#2B7272]">Typ</div>,
+        header: () => <div className="text-[#2B7272] w-[100px]">Type</div>,
         cell: ({ row }) => (
             <Badge
                 variant="outline"
@@ -69,7 +70,7 @@ export const mediationColumns: ColumnDef<any>[] = [
                             <Badge
                                 key={tag.tag.id}
                                 variant="outline"
-                                className="border font-rubik-400 rounded-2xl mt-1 capitalize"
+                                className="border border-[#2B7272] text-[#2B7272] font-rubik-400 rounded-2xl mt-1 capitalize"
                             >
                                 {tag.tag.name}
                             </Badge>

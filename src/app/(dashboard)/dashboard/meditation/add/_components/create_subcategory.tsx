@@ -20,6 +20,7 @@ import { categoryApi } from '@/lib/api'
 type FormData = {
     title: string
     description: string
+    category: Record<any, any> | string
 }
 
 function CreateSubCategory({ addCategory }: { addCategory: (item: any) => void }) {
@@ -27,12 +28,37 @@ function CreateSubCategory({ addCategory }: { addCategory: (item: any) => void }
     const [color, setColor] = useState('Not selected')
     const [loading, setLoading] = useState(false)
     const inputRef = useRef<HTMLInputElement | null>(null)
+    const [showCategory, setShowCategory] = useState(false)
+    const [showedCategories, setShowCategories] = useState([])
+    const [selectedCategory, setSelectedCategory] = useState<any>('')
+    const [categories, setCategories] = useState<any>([])
+
+
 
     const {
         register,
         handleSubmit,
         formState: { errors },
+        setValue
     } = useForm<FormData>()
+
+
+    const categoryChange = (value: string) => {
+        setShowCategory(true);
+        setSelectedCategory(value)
+        setValue('category', value, { shouldValidate: true })
+        setShowCategories(
+            categories.filter((item: any) =>
+                item.name.toLowerCase().includes(value.trim().toLowerCase())
+            )
+        )
+    }
+
+    const onSelectCategory = async (value: any) => {
+        setSelectedCategory(value)
+        setShowCategory(false)
+        setValue('category', value?.name, { shouldValidate: true })
+    }
 
     const onSubmit = async (data: FormData) => {
         try {
@@ -41,6 +67,7 @@ function CreateSubCategory({ addCategory }: { addCategory: (item: any) => void }
             const body = {
                 name: data.title,
                 description: data.description,
+                categoryId: selectedCategory.id,
                 color
             }
             const res = await fetcher(categoryApi.createSubCategory, {
@@ -64,6 +91,26 @@ function CreateSubCategory({ addCategory }: { addCategory: (item: any) => void }
             inputRef.current.focus()
         }
     }, [open])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [categoryRes] = await Promise.allSettled([
+                    fetcher(categoryApi.getAll, { method: 'GET' }),])
+
+                if (categoryRes.status === 'fulfilled') {
+                    setCategories(categoryRes.value)
+                } else {
+                    console.error('Category fetch failed:', categoryRes.reason)
+                }
+
+            } catch (error) {
+                console.error('Unexpected fetch error:', error)
+            }
+        }
+
+        fetchData()
+    }, [])
 
     return (
         <div>
@@ -95,6 +142,46 @@ function CreateSubCategory({ addCategory }: { addCategory: (item: any) => void }
                                     {errors.title.message}
                                 </p>
                             )}
+                        </div>
+
+                        <div>
+                            <label className="block text-base font-light text-[#000000] mb-2">Category</label>
+                            <div className="relative lg:flex gap-2 w-full">
+                                <div className="relative w-full">
+                                    <Input
+                                        placeholder="Select a category"
+                                        className="w-full"
+                                        {...register('category', { required: 'Category is required' })}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => categoryChange(e.target.value)}
+                                        value={selectedCategory?.name || selectedCategory}
+                                        aria-invalid={errors.title ? 'true' : 'false'}
+                                        aria-describedby="title-error"
+                                    />
+
+                                    {(showCategory) && < div className="absolute top-full mt-1 w-full bg-white border hide-scrollbar  border-[#d9d9d9] rounded-md shadow-md max-h-60 overflow-y-auto z-10">
+                                        {showedCategories.slice(0, 3).length > 0 ? (
+                                            showedCategories.slice(0, 3).map((item: any) => (
+                                                <div
+                                                    key={item.id}
+                                                    className="px-2 py-1.5 text-sm hover:bg-gray-100 rounded-md m-1 cursor-pointer capitalize font-rubik-400"
+                                                    onClick={() => onSelectCategory(item)}
+                                                >
+                                                    {item.name}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="px-2 py-2 text-sm text-gray-500 text-center font-rubik-400">
+                                                No categories found
+                                            </div>
+                                        )}
+                                    </div>}
+                                </div>
+
+                            </div>
+
+
+                            {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category.message as string}</p>}
+                            <input type="hidden" {...register("category", { required: "Category is required" })} />
                         </div>
 
                         {/* Description */}

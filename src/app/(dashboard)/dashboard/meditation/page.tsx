@@ -16,22 +16,13 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { ChevronDown } from "lucide-react"
 import Link from "next/link"
 import { meditationApis } from "@/lib/api"
 import { fetcher } from "@/lib/fetcher"
 import { mediationColumns } from "@/lib/coulmns/meditation.columns"
+import { Button } from "@/components/ui/button"
 
 
 export default function MeditationTable() {
@@ -44,7 +35,7 @@ export default function MeditationTable() {
             header: ({ column }) => (
                 <div className="text-[#2B7272]">Action</div>
             ),
-            cell: ({ row }) => <Link href={`/dashboard/meditation/${row.original.id}`} className="capitalize cursor-pointer " > < Badge variant={"outline"} className="text - rubik - 400 rounded- 2xl "> <span className="text-[14px] font-light">View</span></Badge ></ Link >,
+            cell: ({ row }) => <div className="capitalize cursor-pointer "><Badge variant={"outline"} className="text-rubik-400 rounded-2xl "><span className="text-[14px] font-light"><Link href={`/dashboard/meditation/${row.original.id}`} >View</Link></span></Badge></div>,
         },
     ], [mediationColumns, data]);
 
@@ -85,75 +76,96 @@ export default function MeditationTable() {
     return (
         <div className="rounded-[20px]  p-6">
             <div className="flex justify-between items-center">
-                <div className="py-4 font-rubik-400">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="ml-auto">
-                                Signup Method <ChevronDown />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuCheckboxItem
-                                className="capitalize"
+                <div className="py-4 font-rubik-400 flex md:flex-row flex-col gap-3">
+                    <Select
+                    // value={signupMethod} onValueChange={handleChange}
+                    >
+                        <SelectTrigger className="w-44 bg-white">
+                            <SelectValue
+                                placeholder="Signup Method"
+                                className="data-[placeholder]:text-black"
+                            />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                            <SelectItem value="email" className="font-rubik-400">Email</SelectItem>
+                            <SelectItem value="google" className="font-rubik-400">Google</SelectItem>
+
+                            <div className="border-t my-1" />
+                            <div
+                                className="px-3 py-2 text-sm text-red-500 hover:bg-red-50 cursor-pointer rounded-md font-rubik-400"
+                            // onClick={handleClear}
                             >
-                                Email
-                            </DropdownMenuCheckboxItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild className="mx-5">
-                            <Button variant="outline" className=" mx-2">
-                                Subscription Plan <ChevronDown />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            {table
-                                .getAllColumns()
-                                .filter((column) => column.getCanHide())
-                                .map((column) => {
-                                    return (
-                                        <DropdownMenuCheckboxItem
-                                            key={column.id}
-                                            className="capitalize"
-                                            checked={column.getIsVisible()}
-                                            onCheckedChange={(value) =>
-                                                column.toggleVisibility(!!value)
-                                            }
-                                        >
-                                            {column.id}
-                                        </DropdownMenuCheckboxItem>
-                                    )
-                                })}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="ml-auto">
-                                Sort By <ChevronDown />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            {table
-                                .getAllColumns()
-                                .filter((column) => column.getCanHide())
-                                .map((column) => {
-                                    return (
-                                        <DropdownMenuCheckboxItem
-                                            key={column.id}
-                                            className="capitalize"
-                                            checked={column.getIsVisible()}
-                                            onCheckedChange={(value) =>
-                                                column.toggleVisibility(!!value)
-                                            }
-                                        >
-                                            {column.id}
-                                        </DropdownMenuCheckboxItem>
-                                    )
-                                })}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-                <Link href={"/dashboard/meditation/add"}><Button className="font-rubik-400 py-3 bg-[#1F5D57]">Add Meditation</Button></Link>
+                                Clear Selection
+                            </div>
+                        </SelectContent>
+                    </Select>
+
+                    <Select
+                    // value={subscriptionType} onValueChange={handleChangeSubscription}
+                    >
+                        <SelectTrigger className="w-44 bg-white">
+                            <SelectValue
+                                placeholder="Signup Method"
+                                className="data-[placeholder]:text-black"
+                            />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                            <SelectItem value="free" className="font-rubik-400">Free</SelectItem>
+                            <SelectItem value="premium" className="font-rubik-400">Premium</SelectItem>
+
+                            <div className="border-t my-1" />
+                            <div
+                                className="px-3 py-2 text-sm text-red-500 hover:bg-red-50 cursor-pointer rounded-md font-rubik-400"
+                            // onClick={handleClearSubscription}
+                            >
+                                Clear Selection
+                            </div>
+                        </SelectContent>
+                    </Select>
+
+                    <Select
+                    // value={sortValue?.field ? `${sortValue.field}-${sortValue.order}` : ""} onValueChange={handleSort}
+                    >
+                        <SelectTrigger className="w-44 bg-white">
+                            <SelectValue placeholder="Sort By" className="data-[placeholder]:text-black" />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                            <div className="px-2 py-1">
+                                <p className="text-sm text-gray-500 px-2 font-rubik-400">Created At</p>
+                                <SelectItem value="createdAt-asc" className="font-rubik-400 pl-6">
+                                    Ascending
+                                </SelectItem>
+                                <SelectItem value="createdAt-desc" className="font-rubik-400 pl-6">
+                                    Descending
+                                </SelectItem>
+                            </div>
+
+                            {/* <div className="px-2 py-1">
+                            <p className="text-sm text-gray-500 px-2 font-rubik-400">Last Login</p>
+                            <SelectItem value="lastLogin-asc" className="font-rubik-400 pl-6">
+                                Ascending
+                            </SelectItem>
+                            <SelectItem value="lastLogin-desc" className="font-rubik-400 pl-6">
+                                Descending
+                            </SelectItem>
+                        </div> */}
+
+                            <div className="border-t border-gray-200 my-1" />
+
+                            <div
+                                className="cursor-pointer px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded font-rubik-400 select-none"
+                            // onClick={handleSortClear}
+                            >
+                                Clear Selection
+                            </div>
+                        </SelectContent>
+                    </Select>
+
+                </div >
+                <Button className="font-rubik-400 bg-[#2B7272] py-3 text-white hover:bg-[#2B7272]"><Link href="/dashboard/meditation/add" className="">Add Meditation</Link></Button>
             </div>
 
             <div className="rounded-md border">
@@ -177,7 +189,7 @@ export default function MeditationTable() {
                             table.getRowModel().rows.map((row) => (
                                 <TableRow key={row.id}>
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="py-4 font-rubik-400 bg-white">
+                                        <TableCell key={cell.id} className="py-4 font-rubik-400 bg-white ">
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()
@@ -188,7 +200,7 @@ export default function MeditationTable() {
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={mediationColumns.length} className="h-24 text-center">
+                                <TableCell colSpan={mediationColumns.length} className="h-24 text-center font-rubik-400">
                                     {loading ? "Loading ..." : "No data available"}
                                 </TableCell>
                             </TableRow>

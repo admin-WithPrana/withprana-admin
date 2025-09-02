@@ -16,6 +16,12 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  if(authorized && pathname=='/'){
+        return NextResponse.redirect(new URL("/dashboard", req.nextUrl.origin));
+  }else if(!authorized && pathname=='/'){
+        return NextResponse.redirect(new URL("/login", req.nextUrl.origin));
+
+  }
 
   if (!authorized && pathname !== "/login") {
     return NextResponse.redirect(new URL("/login", req.nextUrl.origin));

@@ -1,4 +1,4 @@
-import { ChartColumnBig, SquareUserRound, Settings, Headphones } from "lucide-react";
+import { ChartColumnBig, SquareUserRound, Settings, Headphones, CalendarCheck } from "lucide-react";
 
 export const sidebarLinks = [
     {
@@ -15,6 +15,11 @@ export const sidebarLinks = [
         label: "Manage Meditation",
         href: "/dashboard/meditation",
         icon: Headphones,
+    },
+    {
+        label: "Thought of the Day",
+        href: "/dashboard/thoughts",
+        icon: CalendarCheck,
     },
     {
         label: "Settings",

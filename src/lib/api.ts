@@ -14,5 +14,7 @@ export const categoryApi={
 
 export const meditationApis={
     create:'/meditation',
-    getMediation:(id:string)=>`/meditation/${id}`
+    getMediation:(id:string)=>`/meditation/${id}`,
+    updateMeditaion:(id:string)=>`/meditation/${id}`,
+    deleteMeditation:(id:string)=>`/meditation/${id}`
 }

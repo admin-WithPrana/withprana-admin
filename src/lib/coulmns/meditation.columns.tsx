@@ -84,7 +84,7 @@ export const mediationColumns: ColumnDef<any>[] = [
     },
     {
         accessorKey: "createdAt",
-        header: "Added Date",
+        header: () => <div className="text-[#2B7272]">Added Date</div>,
         cell: ({ row }) => {
             const date = new Date(row.getValue("createdAt"))
             return <div>{date.toLocaleDateString()} {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>

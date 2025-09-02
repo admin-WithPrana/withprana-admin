@@ -22,7 +22,7 @@ type FormData = {
     description: string
 }
 
-function CreateSubCategory({ addCategory }: { addCategory: (item: any) => void }) {
+function CreateSubCategory({ addCategory, categoryId }: { addCategory: (item: any) => void, categoryId: string }) {
     const [open, setOpen] = useState(false)
     const [color, setColor] = useState('Not selected')
     const [loading, setLoading] = useState(false)
@@ -41,7 +41,8 @@ function CreateSubCategory({ addCategory }: { addCategory: (item: any) => void }
             const body = {
                 name: data.title,
                 description: data.description,
-                color
+                color,
+                categoryId
             }
             const res = await fetcher(categoryApi.createSubCategory, {
                 method: 'POST',

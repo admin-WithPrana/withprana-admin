@@ -41,7 +41,7 @@ function AddMeditation() {
     const [showTags, setShowTags] = useState(false)
     const [showedTags, setShowedTags] = useState<any[]>([])
 
-    const { register, handleSubmit, setValue, formState: { errors } } = useForm()
+    const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm()
 
     const imageInputRef = useRef<HTMLInputElement | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -154,11 +154,17 @@ function AddMeditation() {
     }
 
     const onSelectCategory = async (value: any) => {
-        setSelectedCategory(value)
-        setShowCategory(false)
-        setValue('category', value?.name, { shouldValidate: true })
-        const res = await fetcher(categoryApi.getAllsubcategory(value.id), { method: 'GET' })
-        setSubCategories(res)
+        try {
+            setSelectedCategory(value)
+            setShowCategory(false)
+            setValue('category', value?.name, { shouldValidate: true })
+            reset({ subcategory: '' })
+            setSelectedSubCategory('')
+            const res = await fetcher(categoryApi.getAllsubcategory(value.id), { method: 'GET' })
+            setSubCategories(res)
+        } catch (error) {
+            setSubCategories([])
+        }
     }
 
     const onSelectSubCategory = (value: any) => {
@@ -290,7 +296,7 @@ function AddMeditation() {
                                     <img
                                         src={imagePreview}
                                         alt="Thumbnail preview"
-                                        className="w-full h-full rounded-lg object-contain"
+                                        className="w-full h-full rounded-lg object-cover"
                                     />
                                     <button
                                         onClick={removeImage}
@@ -396,7 +402,7 @@ function AddMeditation() {
             </div>
 
             {/* Category and Subcategory */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 lg:mt-16">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 lg:mt-12">
                 {/* Category */}
                 <div>
                     <label className="block text-base font-light text-[#000000] mb-2">Category</label>
@@ -476,7 +482,7 @@ function AddMeditation() {
                         </div>
 
                         <div className="mt-2 lg:mt-0">
-                            <CreateSubCategory addCategory={addSubCategory} />
+                            <CreateSubCategory addCategory={addSubCategory} categoryId={selectedCategory.id} />
                         </div>
                     </div>
                     {errors.subcategory && <p className="text-red-500 text-sm mt-1">{errors.subcategory.message as string}</p>}
@@ -533,7 +539,7 @@ function AddMeditation() {
                             <Badge
                                 key={index}
                                 variant="secondary"
-                                className="bg-[#eef5ff] text-[#2b7272] border border-[#c1ece8] px-3 py-1 capitalize"
+                                className="font-rubik-400 text-[#2b7272] bg-white rounded-full border border-[#2b7272] px-3 py-1 capitalize"
                             >
                                 {tag.name}
                                 <button type="button" onClick={() => removeTag(tag)} className="ml-2 hover:text-[#1f5d57]">

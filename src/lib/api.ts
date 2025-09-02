@@ -18,3 +18,8 @@ export const meditationApis={
     updateMeditaion:(id:string)=>`/meditation/${id}`,
     deleteMeditation:(id:string)=>`/meditation/${id}`
 }
+
+export const thoughtsApi={
+    create:'/thought',
+    getAll:'/thought'
+}

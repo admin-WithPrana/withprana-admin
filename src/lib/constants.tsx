@@ -7,6 +7,11 @@ export const sidebarLinks = [
         icon: ChartColumnBig,
     },
     {
+        label: "Onboarding control",
+        href: "/dashboard/onboarding_control",
+        icon: SquareUserRound,
+    },
+    {
         label: "User Management",
         href: "/dashboard/users",
         icon: SquareUserRound,
@@ -19,6 +24,11 @@ export const sidebarLinks = [
     {
         label: "Thought of the Day",
         href: "/dashboard/thoughts",
+        icon: CalendarCheck,
+    },
+    {
+        label: "Policy & Terms",
+        href: "/dashboard/policy_and_terms",
         icon: CalendarCheck,
     },
     {

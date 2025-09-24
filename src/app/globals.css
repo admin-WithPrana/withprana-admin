@@ -168,3 +168,11 @@
 .hide-scrollbar::-webkit-scrollbar {
   display: none;              /* Chrome, Safari, Edge */
 }
+
+
+.ql-editor {
+  font-family: 'Rubik', sans-serif;
+  font-size: 1rem;         /* Optional */
+  min-height: 200px;       /* ✅ Set minimum height */
+  line-height: 1.5;        /* Optional for better readability */
+}

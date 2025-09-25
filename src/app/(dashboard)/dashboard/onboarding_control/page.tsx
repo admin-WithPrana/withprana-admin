@@ -59,6 +59,14 @@ function Onboarding_control() {
         setModalOpen(false)
     }
 
+    const handleModalChange = (isOpen: boolean) => {
+        setModalOpen(isOpen);
+
+        if (!isOpen) {
+            setSelectedQuestion(null);
+        }
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true)
@@ -164,11 +172,11 @@ function Onboarding_control() {
 
             <CustomModal
                 open={modalOpen}
-                onOpenChange={setModalOpen}
+                onOpenChange={handleModalChange}
                 title="View Question"
             >
 
-                <Question initialData={selectedQuestion} tagsList={tags} closeModal={() => setModalOpen(false)} onUpdate={onUpdate} onDelete={onDelete} onCreate={onCreate} />
+                <Question initialData={selectedQuestion} tagsList={tags} closeModal={() => { setModalOpen(false); setSelectedQuestion(null); }} onUpdate={onUpdate} onDelete={onDelete} onCreate={onCreate} />
 
 
             </CustomModal>

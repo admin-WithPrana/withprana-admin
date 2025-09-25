@@ -23,3 +23,8 @@ export const thoughtsApi={
     create:'/thought',
     getAll:'/thought'
 }
+
+export const policyApi={
+    create:(type:string)=>`/privacy-policy/${type}`,
+    get:(type:string)=>`/privacy-policy/${type}`
+}

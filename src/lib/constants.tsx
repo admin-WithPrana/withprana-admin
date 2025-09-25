@@ -1,4 +1,4 @@
-import { ChartColumnBig, SquareUserRound, Settings, Headphones, CalendarCheck } from "lucide-react";
+import { ChartColumnBig, SquareUserRound, Settings, Headphones, CalendarCheck, LockKeyhole } from "lucide-react";
 
 export const sidebarLinks = [
     {
@@ -29,7 +29,7 @@ export const sidebarLinks = [
     {
         label: "Policy & Terms",
         href: "/dashboard/policy_and_terms",
-        icon: CalendarCheck,
+        icon: LockKeyhole,
     },
     {
         label: "Settings",

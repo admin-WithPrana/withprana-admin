@@ -1,4 +1,4 @@
-import { ChartColumnBig, SquareUserRound, Settings, Headphones, CalendarCheck, LockKeyhole } from "lucide-react";
+import { ChartColumnBig, SquareUserRound, Settings, Headphones, CalendarCheck, LockKeyhole, FileQuestionMark } from "lucide-react";
 
 export const sidebarLinks = [
     {
@@ -9,7 +9,7 @@ export const sidebarLinks = [
     {
         label: "Onboarding control",
         href: "/dashboard/onboarding_control",
-        icon: SquareUserRound,
+        icon: FileQuestionMark,
     },
     {
         label: "User Management",

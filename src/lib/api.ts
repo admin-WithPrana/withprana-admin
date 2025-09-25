@@ -28,3 +28,10 @@ export const policyApi={
     create:(type:string)=>`/privacy-policy/${type}`,
     get:(type:string)=>`/privacy-policy/${type}`
 }
+
+export const onboardingApis={
+    create:'/onboard/',
+    getAll:'/onboard',
+    update:(id:string)=>`/onboard/${id}`,
+    delete:(id:string)=>`/onboard/${id}`
+}

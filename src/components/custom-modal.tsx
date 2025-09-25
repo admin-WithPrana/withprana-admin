@@ -15,9 +15,11 @@ import { ReactNode } from 'react';
 interface CustomModalProps {
     title?: string;
     description?: string;
-    trigger: ReactNode; // You pass a Button or any element
-    children: ReactNode; // Content inside modal
-    footer?: ReactNode;  // Optional footer actions
+    trigger?: ReactNode; // Trigger element (e.g., button)
+    children: ReactNode; // Modal body content
+    footer?: ReactNode;  // Optional footer content
+    open?: boolean;      // Optional controlled open state
+    onOpenChange?: (open: boolean) => void; // Callback when open state changes
 }
 
 export function CustomModal({
@@ -26,9 +28,11 @@ export function CustomModal({
     trigger,
     children,
     footer,
+    open,
+    onOpenChange,
 }: CustomModalProps) {
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogTrigger asChild>
                 {trigger}
             </DialogTrigger>
@@ -36,18 +40,14 @@ export function CustomModal({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
-                    {description && <DialogDescription>{description}</DialogDescription>}
+                    {description && (
+                        <DialogDescription>{description}</DialogDescription>
+                    )}
                 </DialogHeader>
 
-                <div className="py-4">
-                    {children}
-                </div>
+                <div className="py-4">{children}</div>
 
-                {footer && (
-                    <div className="pt-4">
-                        {footer}
-                    </div>
-                )}
+                {footer && <div className="pt-4">{footer}</div>}
             </DialogContent>
         </Dialog>
     );
